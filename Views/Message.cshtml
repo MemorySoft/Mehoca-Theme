@@ -1,0 +1,13 @@
+﻿<div class="alert-background">
+    <div data-alert class="alert-box message-@Model.Type confirmacion">
+        <div class="row">
+            <div class="large-12 columns continue-links">
+                <p>@Html.Raw(Html.Encode(Model.Message).Replace("\n", "<br />"))</p>
+                <span class="close"><a href="#" class="js-booking">MAKE ANOTHER RESERVATION</a></span>
+                <!-- <span class="close"><a href="#car-hire" class="js-hire">VEHICLE OR CAR HIRE</a></span>
+                <span class="close"><a href="#equipment-hire" class="js-extras">EQUIPMENT OR EXTRAS</a></span> -->
+                <span class="close"><a href="/" class="js-home">BACK TO HOME PAGE</a></span>
+            </div>
+        </div>
+    </div>
+</div>

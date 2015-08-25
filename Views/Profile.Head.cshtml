@@ -1,0 +1,16 @@
+@using Orchard.ContentManagement;
+
+@{
+  var userName = ((IContent)Model.ContentItem).As<Orchard.Security.IUser>().UserName;
+}
+  <!-- Profile Head -->
+<div class="profile-head">
+    <h1>Profile of @Html.TitleForPage(userName)</h1>
+
+    @if(WorkContext.CurrentUser != null && WorkContext.CurrentUser.UserName == userName) {
+        @*@Html.ActionLink(T("Edit your profile").Text, "Edit") No queremos que el usuario pueda cambiar los roles! *@
+        <p><a href="~/Users/Account/ChangePassword">Change your password</a></p>
+    }
+
+    <hr/>
+</div>

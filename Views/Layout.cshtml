@@ -1,0 +1,1109 @@
+﻿@functions {
+    // To support the layout classifaction below. Implementing as a razor function because we can, could otherwise be a Func<string[], string, string> in the code block following.
+    string CalcuClassify(string[] zoneNames, string classNamePrefix) {
+        var zoneCounter = 0;
+        var zoneNumsFilled = string.Join("", zoneNames.Select(zoneName => { ++zoneCounter; return Model[zoneName] != null ? zoneCounter.ToString() : "";}).ToArray());
+        return HasText(zoneNumsFilled) ? classNamePrefix + zoneNumsFilled : "";
+    }
+}
+@{
+    /* Global includes for the theme
+    ***************************************************************/    
+    
+    SetMeta("X-UA-Compatible", "IE=edge,chrome=1");
+
+    /* Some useful shortcuts or settings
+    ***************************************************************/
+
+    Func<dynamic, dynamic> Zone = x => Display(x); // Zone as an alias for Display to help make it obvious when we're displaying zones
+
+    /* Layout classification based on filled zones
+    ***************************************************************/
+
+    //Add classes to the wrapper div to toggle aside widget zones on and off
+    var asideClass = CalcuClassify(new [] {"AsideFirst", "AsideSecond"}, "aside-"); // for aside-1, aside-2 or aside-12 if any of the aside zones are filled
+    if (HasText(asideClass)) {
+        Model.Classes.Add(asideClass);
+    }
+
+    //Add classes to the wrapper div to toggle tripel widget zones on and off
+    var tripelClass = CalcuClassify(new [] {"TripelFirst", "TripelSecond", "TripelThird"}, "tripel-"); // for tripel-1, triple-2, etc. if any of the tripel zones are filled
+    if (HasText(tripelClass)) {
+        Model.Classes.Add(tripelClass);
+    }
+
+    //Add classes to the wrapper div to toggle quad widget zones on and off
+    var footerQuadClass = CalcuClassify(new [] {"FooterQuadFirst", "FooterQuadSecond", "FooterQuadThird", "FooterQuadFourth"}, "split-"); // for quad-1, quad-2, etc. if any of the quad zones are filled
+    if (HasText(footerQuadClass)) {
+        Model.Classes.Add(footerQuadClass);
+    }
+
+    WorkContext.Layout.Navigation.Add(New.User(), "10"); // Login and dashboard links
+    WorkContext.Layout.Footer.Add(New.BadgeOfHonor(), "5"); // Powered by Orchard
+
+    /* Last bit of code to prep the layout wrapper
+    ***************************************************************/
+    
+    Model.Id = "layout-wrapper";
+    var tag = Tag(Model, "div"); // using Tag so the layout div gets the classes, id and other attributes added to the Model
+
+}
+
+@tag.StartElement
+
+
+@using System.Web.Mvc;
+@if (WorkContext.CurrentUser != null) { 
+
+<header>
+    <div id="header" class="row">
+        <div class="large-12 columns">
+            @if (Model.Header != null) {
+                @Zone(Model.Header)
+            }
+        </div>
+    </div>
+</header>
+
+<div id="navigation" class="sticky"> 
+    <nav class="top-bar">
+        <ul class="title-area">
+        <li class="name">
+          <h1><a href="~/">@WorkContext.CurrentSite.SiteName </a></h1>
+        </li>
+        <li class="toggle-topbar"><a href="#"><span>Menu</span></a></li>
+        </ul>
+        <section class="top-bar-section">
+            @if (Model.Navigation != null) {
+                @Zone(Model.Navigation)
+            }
+        </section>
+    </nav>
+</div>   
+          
+<div id="featured">
+    @if (Model.Featured != null) {
+    <div class="row">
+        <div class="large-12 columns">
+            @Zone(Model.Featured)
+        </div>
+    </div>
+    }
+</div>
+
+<div id="messages">
+    @if (Model.Messages != null) {    
+        @Zone(Model.Messages)
+    }
+</div>
+
+<div id="before-main">
+@if (Model.BeforeMain != null) {
+    <div class="row">
+        <div class="large-12 columns">
+            @Zone(Model.BeforeMain)
+        </div>
+    </div>
+}
+</div>
+
+<div id="main">
+    <div class="row">
+        @if (Model.AsideFirst != null) {
+        <div id="aside-first" class="large-3 columns">
+            @Zone(Model.AsideFirst)
+        </div>
+        }
+        <div id="content-area" class="@(HasText(asideClass) ? asideClass == "aside-1" || asideClass == "aside-2" ? "large-9 columns" : asideClass == "aside-12" ? "large-6 columns" : "large-12 columns" : "large-12 columns")">
+            @if (Model.BeforeContent != null) {
+            <div id="before-content">
+                @Zone(Model.BeforeContent)
+            </div>
+            }
+            @if (Model.Content != null) {
+            <div id="content">
+                @Zone(Model.Content)
+            </div>
+            }
+            @if (Model.AfterContent != null) {
+            <div id="after-content">
+                @Zone(Model.AfterContent)
+            </div>
+            }
+        </div>
+        @if (Model.AsideSecond != null) {
+        <div id="aside-second" class="large-3 columns">
+            @Zone(Model.AsideSecond)
+        </div>
+        }
+    </div>
+</div>
+
+<div id="tripels">
+    @if (Model.TripelFirst != null || Model.TripelSecond != null || Model.TripelThird != null) {
+    <div class="row">
+        @if (Model.TripelFirst != null) {
+        <div id="tripel-first" class="@(HasText(tripelClass) ? tripelClass == "tripel-12" || tripelClass == "tripel-23" || tripelClass == "tripel-13" ? "large-6 columns" : tripelClass == "tripel-123" ? "large-4 columns" : "large-12 columns" : "large-12 columns")">
+            @Zone(Model.TripelFirst)
+        </div>
+        }
+        @if (Model.TripelSecond != null) {
+        <div id="tripel-second" class="@(HasText(tripelClass) ? tripelClass == "tripel-12" || tripelClass == "tripel-23" || tripelClass == "tripel-13" ? "large-6 columns" : tripelClass == "tripel-123" ? "large-4 columns" : "large-12 columns" : "large-12 columns")">
+            @Zone(Model.TripelSecond)
+        </div>
+        }
+        @if (Model.TripelThird != null) {
+        <div id="tripel-third" class="@(HasText(tripelClass) ? tripelClass == "tripel-12" || tripelClass == "tripel-23" || tripelClass == "tripel-13" ? "large-6 columns" : tripelClass == "tripel-123" ? "large-4 columns" : "large-12 columns" : "large-12 columns")">
+            @Zone(Model.TripelThird)
+        </div>
+        }
+    </div>
+    }   
+</div>
+
+<div id="after-main">
+@if (Model.AfterMain != null) {
+    <div class="row">
+        <div class="large-12 columns">
+            @Zone(Model.AfterMain)
+        </div>
+    </div>
+}
+</div>
+
+    <div id="quads">
+        @if (Model.FooterQuadFirst != null || Model.FooterQuadSecond != null || Model.FooterQuadThird != null || Model.FooterQuadFourth != null) {
+        <div class="row">
+            <hr/>
+            @if (Model.FooterQuadFirst != null) {
+            <div id="quad-first" class="@(HasText(footerQuadClass) ? footerQuadClass == "split-1" || footerQuadClass == "split-2" || footerQuadClass == "split-3" || footerQuadClass == "split-4" ? "large-12 columns" : footerQuadClass == "split-12" || footerQuadClass == "split-13" || footerQuadClass == "split-14" || footerQuadClass == "split-23" || footerQuadClass == "split-24" || footerQuadClass == "split-34" ? "large-6 columns" : footerQuadClass == "split-123" || footerQuadClass == "split-124" || footerQuadClass == "split-134" || footerQuadClass == "split-234" ? "large-4 columns" : "large-3 columns" : "large-12 columns")">
+                @Zone(Model.FooterQuadFirst)
+            </div>
+            }
+            @if (Model.FooterQuadSecond != null) {
+            <div id="quad-second" class="@(HasText(footerQuadClass) ? footerQuadClass == "split-1" || footerQuadClass == "split-2" || footerQuadClass == "split-3" || footerQuadClass == "split-4" ? "large-12 columns" : footerQuadClass == "split-12" || footerQuadClass == "split-13" || footerQuadClass == "split-14" || footerQuadClass == "split-23" || footerQuadClass == "split-24" || footerQuadClass == "split-34" ? "large-6 columns" : footerQuadClass == "split-123" || footerQuadClass == "split-124" || footerQuadClass == "split-134" || footerQuadClass == "split-234" ? "large-4 columns" : "large-3 columns" : "large-12 columns")">
+                @Zone(Model.FooterQuadSecond)
+            </div>
+            }
+            @if (Model.FooterQuadThird != null) {
+            <div id="quad-third" class="@(HasText(footerQuadClass) ? footerQuadClass == "split-1" || footerQuadClass == "split-2" || footerQuadClass == "split-3" || footerQuadClass == "split-4" ? "large-12 columns" : footerQuadClass == "split-12" || footerQuadClass == "split-13" || footerQuadClass == "split-14" || footerQuadClass == "split-23" || footerQuadClass == "split-24" || footerQuadClass == "split-34" ? "large-6 columns" : footerQuadClass == "split-123" || footerQuadClass == "split-124" || footerQuadClass == "split-134" || footerQuadClass == "split-234" ? "large-4 columns" : "large-3 columns" : "large-12 columns")">
+                @Zone(Model.FooterQuadThird)
+            </div>
+            }
+            @if (Model.FooterQuadFourth != null) {
+            <div id="quad-fourth" class="@(HasText(footerQuadClass) ? footerQuadClass == "split-1" || footerQuadClass == "split-2" || footerQuadClass == "split-3" || footerQuadClass == "split-4" ? "large-12 columns" : footerQuadClass == "split-12" || footerQuadClass == "split-13" || footerQuadClass == "split-14" || footerQuadClass == "split-23" || footerQuadClass == "split-24" || footerQuadClass == "split-34" ? "large-6 columns" : footerQuadClass == "split-123" || footerQuadClass == "split-124" || footerQuadClass == "split-134" || footerQuadClass == "split-234" ? "large-4 columns" : "large-3 columns" : "large-12 columns")">
+                @Zone(Model.FooterQuadFourth)
+            </div>
+            }
+        </div>
+        }
+    </div>
+
+@tag.EndElement
+
+<footer>
+    @if(Model.Footer != null) {
+        <div id="footer-sub" class="row">
+            <div class="large-12 columns">
+                @Zone(Model.Footer)
+            </div>
+        </div>
+    }
+</footer>
+
+} else {
+<!-- Login Form -->
+<div class="row">
+    <div class="large-3 large-centered columns">
+        <img src="~/Media/Default/Corporate/mehoca_logo_web.png" alt="">
+    </div>
+</div>
+<div class="row outside">
+    <div class="large-6 large-centered columns">
+        <h1>CLIENT LOGIN</h1>
+        <p>Please enter your username and password.</p>
+        <form action="~/Users/Account/LogOn" method="post">
+        <div>
+            <ul>
+                <li>
+                    <label for="username-email">Username</label> 
+                    <input autofocus="autofocus" id="username-email" name="userNameOrEmail" value="" type="text" />
+                </li>
+                <li>
+                    <label for="password">Password</label> 
+                    <input id="password" name="password" type="password" />
+                </li>
+                <li>
+                    <input id="remember-me" name="rememberMe" value="true" type="checkbox" />
+                    <input name="rememberMe" value="false" type="hidden" />
+                    <label class="forcheckbox" for="remember-me"> Remember Me</label>
+                </li>
+            </ul>
+            <p><button class="button" type="submit">Sign In</button></p>
+        </div>
+        </form>
+    </div>
+</div>
+
+<!-- Login extra info -->
+<div class="row">
+    <br>
+    <div class="large-6 columns">
+        <p class="contact left">
+            <i class="fa fa-phone-square"></i> <strong>+34 971 151 591</strong> | 
+            <a href="mailto:info@menorcahomecare.com"><i class="fa fa-envelope"></i> info@menorcahomecare.com</a>
+        </p>
+    </div>
+    <div class="large-6 columns">
+        <p class="right">
+            <a data-reveal-id="lost-pass" href="#">Lost your pasword?</a>
+        </p>
+    </div>
+</div>
+
+<!-- Recover password form -->
+<div id="lost-pass" class="reveal-modal small">
+    <h1>Lost Password</h1>
+    <p>Please enter your username or email address. You will receive a link to create a new password via email.</p>
+    <form method="post" action="~/Users/Account/RequestLostPassword">    
+        <fieldset>
+            <div>
+                <label for="username">Username or E-mail:</label>
+                <input type="text" value="" name="username" id="username"> 
+             
+            </div>
+            <div>
+                <button type="submit" class="primaryAction">Send Request</button>
+            </div>
+        </fieldset>
+    <input type="hidden" value="NxaGhQIT5AbQ4cVIyv-DcXWRXekhjJ0u3dTaURN5R-iDusZguBMBVvcX9OcT1R79FzMoctTEI-k0Xvi2IO6REqmfOXAU595GQNoM3sLSiS-nlioIw_uFY_Wv3smWQaost74sof7UeBvgdgC-QfZxIdT-ceXWLy93kBm6cQ8CZ1o1" name="__RequestVerificationToken">
+    </form>
+    <a class="close-reveal-modal">×</a>
+</div>    
+}
+
+<!-- script src="/Themes/Mehoca/Scripts/vendor/jquery.js"></script -->
+<script src="~/Themes/Mehoca/Scripts/foundation.min.js"></script>
+<script src="~/Themes/Mehoca/Scripts/responsive-tables.js"></script>
+<script src="~/Themes/Mehoca/Scripts/touchtouch.min.js"></script>
+<script src="~/Themes/Mehoca/Scripts/picker.js"></script>
+<script src="~/Themes/Mehoca/Scripts/picker.time.js"></script>
+<script src="~/Themes/Mehoca/Scripts/picker.date.js"></script>
+
+<script>
+    $(document).foundation();
+</script>
+<script src="~/Themes/Mehoca/Scripts/scripts.js"></script>
+
+<!-- 
+######################################################################################
+
+                                MODALES INGLÉS
+
+###################################################################################### 
+-->
+
+<!-- MODALS CLEANING ////////////////////////////////////////////////////////////////////// -->
+
+    <!-- Spring Cleaning -->
+    <div id="ServiceRequest_Clean_Spring_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Spring Cleaning</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Arrival Cleaning -->
+    <div id="ServiceRequest_Clean_Arrival_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Arrival Cleaning</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+<!-- MODALS PACKS ////////////////////////////////////////////////////////////////////// -->
+
+    <!-- Pack Standard A -->
+    <div id="ServiceRequest_Food_Standard_A_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Standard A Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack Standard B -->
+    <div id="ServiceRequest_Food_Standard_B_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Standard B Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack Superior A -->
+    <div id="ServiceRequest_Food_Superior_A_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Superior A Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack Superior B -->
+    <div id="ServiceRequest_Food_Superior_B_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Superior B Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack VIP Hamper Small -->
+    <div id="ServiceRequest_Hamper_Small_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>VIP Hamper Small Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack VIP Hamper Large -->
+    <div id="ServiceRequest_Hamper_Large_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>VIP Hamper Large Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack Basicos Esenciales -->
+    <div id="ServiceRequest_Essentials_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Basic Essentials Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack Barbacoa -->
+    <div id="ServiceRequest_BBQ_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>BBQ Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack Celebraciones -->
+    <div id="ServiceRequest_Celebration_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Celebrations Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack Limpieza -->
+    <div id="ServiceRequest_Household_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Household Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+<!-- MODALS CAR RATES ////////////////////////////////////////////////////////////////////// -->
+
+    <!-- Sepecial Wintter Offer -->
+    <div id="car_rates_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>CAR HIRING RATES</h2>
+    <hr/>
+    <div class="large-12 columns">
+    <table class="sencilla responsive">
+    <thead>
+    <tr>
+    <th width="120">GROUP</th>
+    <th width="120">March 22 - April 30</th>
+    <th width="120">May 01 - July 02</th>
+    <th width="120">July 03 - Aug 27</th>
+    <th width="120">Aug 28 - Sept 24</th>
+    <th width="120">Sept 25 - Oct 30</th>
+    <th width="200">Wintter months</th>     
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td><strong>A</strong></td>
+    <td>125</td>
+    <td>170</td>
+    <td>260</td>
+    <td>170</td>
+    <td>125</td>
+    <td><small><a href="#" data-reveal-id="car_rates_wintter_DETAILS" class="button">Special Rates</i></a></small></td>
+    </tr>
+    <tr>
+    <td><strong>B</strong></td>
+    <td>150</td>
+    <td>190</td>
+    <td>290</td>
+    <td>190</td>
+    <td>150</td>
+    <td></td>
+    </tr>
+    <tr>
+    <td><strong>C</strong></td>
+    <td>170</td>
+    <td>240</td>
+    <td>350</td>
+    <td>240</td>
+    <td>170</td>
+    <td></td>
+    </tr>
+    <tr>
+    <td><strong>D</strong></td>
+    <td>180</td>
+    <td>250</td>
+    <td>380</td>
+    <td>250</td>
+    <td>180</td>
+    <td></td>                                                                       
+    </tr>
+    <tr>
+    <td><strong>E</strong></td>
+    <td>190</td>
+    <td>270</td>
+    <td>420</td>
+    <td>270</td>
+    <td>190</td>
+    <td></td>                                                                       
+    </tr>
+    <tr>
+    <td><strong>F</strong></td>
+    <td>230</td>
+    <td>320</td>
+    <td>580</td>
+    <td>320</td>
+    <td>230</td>
+    <td></td>                                                                       
+    </tr>
+    <tr>
+    <td><strong>G</strong></td>
+    <td>280</td>
+    <td>360</td>
+    <td>600</td>
+    <td>360</td>
+    <td>280</td>
+    <td></td>                                                                       
+    </tr>
+    <tr>
+    <td><strong>H</strong></td>
+    <td>280</td>
+    <td>380</td>
+    <td>620</td>
+    <td>380</td>
+    <td>280</td>
+    <td></td>                                                                       
+    </tr>
+    </tbody>
+    </table>
+    </div>
+    <br>
+    <br>
+    <h2>CONDITIONS</h2>
+    <hr>
+    <div class="large-6 columns">
+    <p>All prices are quoted in Euros per week and include:
+    <ul>
+    <li>IVA/VAT</li>
+    <li>Full comprehensive insurance</li>
+    <li>CDW</li>
+    <li>Bail bond etc.</li>
+    <li>Unlimited mileage</li>
+    <li>Additional drivers</li>
+    </ul>
+    </p>
+    <p>Fuel: full tank provided to be left the same on return (credit card required).</p>
+    <p>Car collection and drop-off at Mahón airport.</p>
+    </div>
+    <div class="large-6 columns">
+    <p>All grouping are subject to availability.</p>
+    <p>It is recommended that peak season booking should be made at least 30 days in advance.</p>
+    <p>Where a period of hire spans two seasons, the price will be calculated on a pro-rata basis.</p>
+    <p>Drivers must be aged 25-75 with a current Full Driving License, which must be in their possesion at all times.</p>
+    <p>Payment payable on collection, there is a 3% surcharge, on any cards.</p>
+    </div>
+    </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>            
+    </div>
+
+    <!-- Sepecial Wintter Offer -->
+    <div id="car_rates_wintter_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Special Wintter Offer</h2>
+    <hr/>
+    <div class="large-6 columns">
+    <p><strong>Until 27th March</strong> <br/>Group "A" car only 70 &euro;/week</p>
+    </div>
+    <div class="large-6 columns">
+    <p><strong>Between 27th March and 15th May</strong> <br/>Group "A" car only 105 &euro;/week</p>
+    </div>
+    </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+
+<!-- 
+######################################################################################
+
+                                MODALES CASTELLANO
+
+###################################################################################### 
+-->
+
+<!-- MODALS LIMPIEZA ////////////////////////////////////////////////////////////////////// -->
+
+    <!-- Limpieza de Primavera -->
+    <div id="ES_ServiceRequest_Clean_Spring_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Limpieza de Primavera</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Limpieza de llegada -->
+    <div id="ES_ServiceRequest_Clean_Arrival_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Limpieza de llegada</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+<!-- MODALS PACKS ////////////////////////////////////////////////////////////////////// -->
+
+    <!-- Pack Standard A -->
+    <div id="ES_ServiceRequest_Food_Standard_A_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Standard A Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack Standard B -->
+    <div id="ES_ServiceRequest_Food_Standard_B_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Standard B Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack Superior A -->
+    <div id="ES_ServiceRequest_Food_Superior_A_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Superior A Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack Superior B -->
+    <div id="ES_ServiceRequest_Food_Superior_B_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Superior B Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack VIP Hamper Small -->
+    <div id="ES_ServiceRequest_Hamper_Small_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>VIP Hamper Small Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack VIP Hamper Large -->
+    <div id="ES_ServiceRequest_Hamper_Large_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>VIP Hamper Large Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack Basicos Esenciales -->
+    <div id="ES_ServiceRequest_Essentials_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Basic Essentials Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack Barbacoa -->
+    <div id="ES_ServiceRequest_BBQ_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>BBQ Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack Celebraciones -->
+    <div id="ES_ServiceRequest_Celebration_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Celebrations Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <!-- Pack Limpieza -->
+    <div id="ES_ServiceRequest_Household_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Household Pack</h2>
+    <p class="lead">This service includes:</p>
+    <ul>
+    <li>Dictumst quisque etiam massa dictumst nibh</li>
+    <li>Ad amet placerat faucibus</li>
+    <li>Ipsum rhoncus tempus</li>
+    <li>Iaculis ultricies posuere</li>
+    <li>Nisl scelerisque dolor adipiscing</li>
+    <li>Senectus nunc nisi aenean</li>
+    <li>Semper tellus mattis fringilla</li>
+    </ul>
+    </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+<!-- MODALS CAR RATES ////////////////////////////////////////////////////////////////////// -->
+
+    <!-- Sepecial Wintter Offer -->
+    <div id="ES_car_rates_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>TARIFAS DE ALQUILER</h2>
+    <hr/>
+    <div class="large-12 columns">
+    <table class="sencilla responsive">
+    <thead>
+    <tr>
+    <th width="120">GRUPO</th>
+    <th width="120">Marzo 22 - Abril 30</th>
+    <th width="120">Mayo 01 - Julio 02</th>
+    <th width="120">Julio 03 - Ago 27</th>
+    <th width="120">Ago 28 - Sept 24</th>
+    <th width="120">Sept 25 - Oct 30</th>
+    <th width="200">Meses de invierno</th>     
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td><strong>A</strong></td>
+    <td>125</td>
+    <td>170</td>
+    <td>260</td>
+    <td>170</td>
+    <td>125</td>
+    <td><small><a href="#" data-reveal-id="ES_car_rates_wintter_DETAILS" class="button">Tarifas especiales</i></a></small></td>
+    </tr>
+    <tr>
+    <td><strong>B</strong></td>
+    <td>150</td>
+    <td>190</td>
+    <td>290</td>
+    <td>190</td>
+    <td>150</td>
+    <td></td>
+    </tr>
+    <tr>
+    <td><strong>C</strong></td>
+    <td>170</td>
+    <td>240</td>
+    <td>350</td>
+    <td>240</td>
+    <td>170</td>
+    <td></td>
+    </tr>
+    <tr>
+    <td><strong>D</strong></td>
+    <td>180</td>
+    <td>250</td>
+    <td>380</td>
+    <td>250</td>
+    <td>180</td>
+    <td></td>                                                                       
+    </tr>
+    <tr>
+    <td><strong>E</strong></td>
+    <td>190</td>
+    <td>270</td>
+    <td>420</td>
+    <td>270</td>
+    <td>190</td>
+    <td></td>                                                                       
+    </tr>
+    <tr>
+    <td><strong>F</strong></td>
+    <td>230</td>
+    <td>320</td>
+    <td>580</td>
+    <td>320</td>
+    <td>230</td>
+    <td></td>                                                                       
+    </tr>
+    <tr>
+    <td><strong>G</strong></td>
+    <td>280</td>
+    <td>360</td>
+    <td>600</td>
+    <td>360</td>
+    <td>280</td>
+    <td></td>                                                                       
+    </tr>
+    <tr>
+    <td><strong>H</strong></td>
+    <td>280</td>
+    <td>380</td>
+    <td>620</td>
+    <td>380</td>
+    <td>280</td>
+    <td></td>                                                                       
+    </tr>
+    </tbody>
+    </table>
+    </div>
+    <br>
+    <br>
+    <h2>CONDICIONES</h2>
+    <hr>
+    <div class="large-6 columns">
+    <p>Todos los precios son en Euros por semana e incluyen:
+    <ul>
+    <li>IVA</li>
+    <li>Seguro a todo riesgo</li>
+    <li>CDW</li>
+    <li>Fianza</li>
+    <li>Kilometraje ilimitado</li>
+    <li>Conductores adicionales</li>
+    </ul>
+    </p>
+    <p>Combustible: se entrega con el depósito lleno y debe devolverse igual (tarjeta de crédito como fianza).</p>
+    <p>Recogida y entrega del vehículo en el aeropuerto de Mahón.</p>
+    </div>
+    <div class="large-6 columns">
+    <p>Todos los vehículos están sujetos a disponibilidad.</p>
+    <p>Se recomienda reservar con 30 días de antelación en temporada alta.</p>
+    <p>Cuando una reserva abarque dos temporadas el precio se calculará proporcionalmente.</p>
+    <p>Los conductores deberán tener entre 25 y 75 años y poseer una licencia de conducir válida, la cual deberán llevar consigo.</p>
+    <p>Los pagos realizados en la recogida tienen un recargo del 3% con cualquier tarjeta.</p>
+    </div>
+    </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>            
+    </div>
+
+    <!-- Oferta especial de invierno -->
+    <div id="ES_car_rates_wintter_DETAILS" class="reveal-modal">
+    <div class="row">
+    <div class="large-12 columns">
+    <h2>Oferta especial de invierno</h2>
+    <hr/>
+    <div class="large-6 columns">
+    <p><strong>Antes del 27 de Marzo</strong> <br/>Vehículos del Grupo "A" solo 70 &euro;/semana</p>
+    </div>
+    <div class="large-6 columns">
+    <p><strong>Entre el 27 de Marzo y el 15 de Mayo</strong> <br/>Vehículos del Grupo "A" solo 105 &euro;/semana</p>
+    </div>
+    </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
