@@ -6,84 +6,27 @@
   // Creamos las rutas del usuario para el módulo Profile 
   var userProfile = "Profile/" + @userName;
 }
+
 <div class="user-display">
     @if (WorkContext.CurrentUser != null) {
         <div class="user-actions welcome right">
             <ul class="user-actions-menu">
                 <li>
-                    <!-- La URL será @userProfile -->
-                    <a href="~/@userProfile"><i class="fa fa-user"></i> @userName</a>
+                    <a class="user-profile-link" href="~/@userProfile"><i class="fa fa-user"></i>@userName</a>
                 </li>
-                <li class="danger">
-                    @if (AuthorizedFor(Orchard.Security.StandardPermissions.AccessAdminPanel)) {
-                        if (WorkContext.CurrentUser.UserName == "admin") {
-                            <!-- Dispara el menú de admin -->
-                            <a href="#" id="admin-menu-button" title="Web admin"><i class="fa fa-cog"></i> Dashboard</a>  
-                                                                                                                     
-                        } else if (WorkContext.CurrentUser.UserName == "manager") {
-                            <!-- Dispara el menú de manager -->
-                            <a href="#" title="Configurations | Configuraciones" data-dropdown="manager-menu"><i class="fa fa-cog"></i> Administration</a>
-                            <ul id="manager-menu" class="f-dropdown" data-dropdown-content>
-                              <li><a target="_blank" href="~/Admin/Users" title="Manage users | Administrar usuarios"><i class="fa fa-user"></i> Manage Users</a></li>
-                              <li><a target="_blank" href="~/Admin/Webstation.Module.UserImport" title="Manage bulk users | Administrar usuarios en grupo"><i class="fa fa-users"></i> User Import</a></li>
-                              <li><a target="_blank" href="~/Users/Account/RequestLostPassword"><i class="fa fa-envelope"></i> Send password recovery email</a></li>
-                              <li><a target="_blank" href="~/Admin/Orchard.MediaLibrary" title="Manage image files | Administrar imágenes"><i class="fa fa-picture-o"></i> Manage Images</a></li>
-                              <li><a target="_blank" href="~/Admin/Blogs/52" title="Publish an english post | Publicar artículo en inglés"><i class="fa fa-pencil"></i> Post to Marketplace ENG</a></li>
-                              <li><a target="_blank" href="~/Admin/Blogs/241" title="Publish english news | Publicar noticia en inglés"><i class="fa fa-pencil"></i> Post to News ENG</a></li>
-                              <li><a target="_blank" href="~/Admin/Blogs/109" title="Publish an spanish post | Publicar artículo en español"><i class="fa fa-pencil"></i> Publicar en Marketplace ESP</a></li>
-                              <li><a target="_blank" href="~/Admin/Blogs/242" title="Publish spanish news | Publicar noticia en español"><i class="fa fa-pencil"></i> Publicar en Noticias ESP</a></li>
-                            </ul>
-                        } else {
-                            <!-- Dispara el menú de publisher -->
-                            <a href="#" data-dropdown="publisher-menu"><i class="fa fa-cog"></i> Administration</a>
-                            <ul id="publisher-menu" class="f-dropdown" data-dropdown-content>
-                              <li><a target="_blank" href="~/Admin/Blogs/52" title="Publish an english post | Publicar artículo en inglés"><i class="fa fa-pencil"></i> Post to Marketplace ENG</a></li>
-                              <li><a target="_blank" href="~/Admin/Blogs/241" title="Publish english news | Publicar noticia en inglés"><i class="fa fa-pencil"></i> Post to News ENG</a></li>
-                              <li><a target="_blank" href="~/Admin/Blogs/109" title="Publish an spanish post | Publicar artículo en español"><i class="fa fa-pencil"></i> Publicar en Marketplace ESP</a></li>
-                              <li><a target="_blank" href="~/Admin/Blogs/242" title="Publish spanish news | Publicar noticia en español"><i class="fa fa-pencil"></i> Publicar en Noticias ESP</a></li>
-                            </ul>
-                        } 
+                @if (AuthorizedFor(Orchard.Security.StandardPermissions.AccessAdminPanel)) {  
+                    if (WorkContext.CurrentUser.UserName == "admin" || WorkContext.CurrentUser.UserName == "manager" || WorkContext.CurrentUser.UserName == "publisher") {
+                    <li class="danger"> 
+                        <a href="~/Admin" title="Administration zone"><i class="fa fa-cog"></i>ADMINISTRATION</a> 
+                    </li> 
                     }
-                </li>
-                <!-- Personalizamos el botón del logout y agregamos el selector de idiomas al menú de usuario  -->
+                }
                 <li>
-                    <a href="~/Users/Account/LogOff?ReturnUrl=~/" title="Sign Out | Salir"><i class="fa fa-arrow-circle-right"></i> LogOut</a>
+                    <a href="~/Users/Account/LogOff?ReturnUrl=~/" title="Sign Out | Salir"><i class="fa fa-arrow-circle-right"></i>LOG OUT</a>
                 </li>
                 <li><a class="GB" href="~/"><img src="~/Media/Default/Localization/GB.png" alt="Gb"></a></li>
                 <li><a class="ES" href="~/es/inicio"><img src="~/Media/Default/Localization/ES.png" alt="Es"></a></li>
             </ul> 
         </div>
     } 
-</div>
-
-<!-- Lo mantenemos aparte para que no rompa la estructura de la barra de navegación -->
-<div id="admin-menu" style="display: none;">
-    <ul>
-        <li><a href="~/Admin/Blogs">Blog List</a></li>
-        <li><a href="~/Admin/Blogs/Create">New Blog</a></li>
-        <li><a href="~/Admin/Contents/Create/Page">New Page</a></li>
-        <li><a href="~/Admin/Contents/Create/ProjectionPage">New Projection</a></li>
-        <li><a href="~/Admin/Contents/List">Content</a></li>
-        <li><a href="~/Admin/ContentTypes">Content Definition</a></li>
-        <li><a href="~/Admin/Navigation">Navigation</a></li>
-        <li><a href="~/Admin/Widgets">Widgets</a></li>
-        <li><a href="~/Admin/Taxonomies">Taxonomies</a></li>
-        <li><a href="~/Admin/Tags">Tags</a></li>
-        <li><a href="~/Admin/Orchard.MediaLibrary">Media</a></li>
-        <li><a href="~/Admin/Orchard.MediaProcessing">Profiles</a></li>
-        <li><a href="~/Admin/Themes">Themes</a></li>
-        <li><a href="~/Admin/Modules/Features">Modules</a></li>
-        <li><a href="~/Admin/Workflows">Workflows</a></li>
-        <li><a href="~/Admin/Orchard.CustomForms">Custom Forms</a></li>
-        <li><a href="~/Admin/Projector">Queries</a></li>
-        <li><a href="~/Admin/Users">Manage Users</a></li>
-        <li><a href="~/Admin/Webstation.Module.UserImport">User Import</a></li>
-        <li><a href="~/Admin/Settings/Index">Settings</a></li>
-        <li><a href="~/Packaging/Gallery/Sources">Gallery</a></li>
-        <li><a href="~/Admin/Settings/Email">Email</a></li>
-        <li><a href="~/Admin/Settings/Media">Media</a></li>
-        <li><a href="~/Admin/Settings/Users">Users</a></li>
-        <li><a href="~/Admin/Orchard.OutputCache">Cache</a></li>
-        <li><a href="~/Admin/Reports">Reports</a></li>
-    </ul>
 </div>

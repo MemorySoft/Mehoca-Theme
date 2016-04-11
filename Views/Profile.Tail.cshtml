@@ -1,1 +1,17 @@
-<!-- Profile Tail -->
+@using Orchard.ContentManagement;
+
+@{
+  var userName = ((IContent)Model.ContentItem).As<Orchard.Security.IUser>().UserName;
+}
+
+<!-- Profile Controls -->
+<div class="profile-controls">
+	<h3 class="titulo">@T("Change password")</h3>
+  @if(WorkContext.CurrentUser != null && WorkContext.CurrentUser.UserName == userName) {
+      <p>Change your password regulary and keep it in a safe place. Click the button below to reset your current password.</p>
+      <p>
+      	<hr>
+      	<a class="button small btn-caution" href="~/Users/Account/ChangePassword">CHANGE PASSWORD</a>
+      </p>
+  }
+</div>

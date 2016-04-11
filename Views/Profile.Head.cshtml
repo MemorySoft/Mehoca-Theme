@@ -5,12 +5,7 @@
 }
   <!-- Profile Head -->
 <div class="profile-head">
-    <h1>Profile of @Html.TitleForPage(userName)</h1>
-
-    @if(WorkContext.CurrentUser != null && WorkContext.CurrentUser.UserName == userName) {
-        @*@Html.ActionLink(T("Edit your profile").Text, "Edit") No queremos que el usuario pueda cambiar los roles! *@
-        <p><a href="~/Users/Account/ChangePassword">Change your password</a></p>
-    }
-
-    <hr/>
+    <h1>Profile of <strong>@Html.TitleForPage(userName)</strong></h1>
+    <br>
+    <br>
 </div>

@@ -143,7 +143,7 @@ $(document).ready(function () {
     });
 
 
-    // Selector de contenidos
+    // Selector de contenidos (Pestañas)
     // ----------------------------------------
 
     var contenidosInactivos = [];

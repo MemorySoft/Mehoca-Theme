@@ -93,7 +93,11 @@
 
 <div id="messages">
     @if (Model.Messages != null) {    
-        @Zone(Model.Messages)
+    <div class="row">
+        <div class="large-12 columns">
+            @Zone(Model.Messages)
+        </div>
+    </div>
     }
 </div>
 
@@ -289,6 +293,7 @@
 <script src="~/Themes/Mehoca/Scripts/picker.js"></script>
 <script src="~/Themes/Mehoca/Scripts/picker.time.js"></script>
 <script src="~/Themes/Mehoca/Scripts/picker.date.js"></script>
+<script src="~/Themes/Mehoca/Scripts/tablefilter.js"></script>
 
 <script>
     $(document).foundation();
